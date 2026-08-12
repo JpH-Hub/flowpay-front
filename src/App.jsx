@@ -1,22 +1,34 @@
-import { CheckCircle } from 'lucide-react'
-import { Toaster, toast } from 'sonner'
+import { useState } from 'react'
+import { Toaster } from 'sonner'
+import Sidebar from './components/layout/Sidebar.jsx'
+import VisaoGeral from './views/VisaoGeral.jsx'
+import AbrirChamado from './views/AbrirChamado.jsx'
+import FecharChamado from './views/FecharChamado.jsx'
 
 function App() {
+  const [activeTab, setActiveTab] = useState('visao-geral')
+
   return (
-    <div className="flex h-screen flex-col items-center justify-center gap-4 bg-gray-100">
+    <div className="flex h-screen w-full bg-white">
       <Toaster position="top-right" richColors />
 
-      <h1 className="flex items-center gap-2 text-4xl font-bold text-blue-600">
-        <CheckCircle className="h-10 w-10 text-green-500" />
-        FlowPay Front-end Funciona! 🚀
-      </h1>
+      {activeTab === 'visao-geral' && (
+        <VisaoGeral activeTab={activeTab} setActiveTab={setActiveTab} />
+      )}
 
-      <button
-        onClick={() => toast.success('Tudo funcionando perfeitamente!')}
-        className="rounded bg-blue-600 px-4 py-2 font-semibold text-white shadow hover:bg-blue-700 active:scale-95 transition-all cursor-pointer"
-      >
-        Testar Notificação (Toast)
-      </button>
+      {activeTab === 'abrir-chamado' && (
+        <div className="flex h-screen w-full">
+          <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <AbrirChamado />
+        </div>
+      )}
+
+      {activeTab === 'fechar-chamado' && (
+        <div className="flex h-screen w-full">
+          <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+          <FecharChamado />
+        </div>
+      )}
     </div>
   )
 }
