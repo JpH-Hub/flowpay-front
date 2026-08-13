@@ -4,10 +4,10 @@ import Sidebar from './components/layout/Sidebar.jsx'
 import VisaoGeral from './views/VisaoGeral.jsx'
 import AbrirChamado from './views/AbrirChamado.jsx'
 import FecharChamado from './views/FecharChamado.jsx'
+import { fetchTickets } from './service/apiService.js'
 
 function App() {
   const [activeTab, setActiveTab] = useState('visao-geral')
-
   return (
     <div className="flex h-screen w-full bg-white">
       <Toaster position="top-right" richColors />
