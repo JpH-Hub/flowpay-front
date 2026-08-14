@@ -43,6 +43,17 @@ export const apiService = {
     });
     
     return handleResponse(response);
+  },
+
+  getActiveTickets: async () => {
+    const response = await fetch(`${API_URL}/tickets/active`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    return handleResponse(response);
   }
   
 };
