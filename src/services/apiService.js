@@ -35,7 +35,7 @@ export const apiService = {
   },
 
   getDashboard: async () => {
-    const response = await fetch(`${API_URL}/dashboard/active`, {
+    const response = await fetch(`${API_URL}/dashboard`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
