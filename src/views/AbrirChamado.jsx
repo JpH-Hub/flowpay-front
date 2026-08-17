@@ -1,13 +1,44 @@
 import { useState } from 'react'
-import { PlusCircle, MessageSquarePlus, CheckCircle2 } from 'lucide-react'
+import { PlusCircle, MessageSquarePlus, CheckCircle2, Loader } from 'lucide-react'
+import { toast } from 'sonner' 
+import { apiService } from '../services/apiService.js'
 
-export default function AbrirChamado() {
+export default function AbrirChamado({ refreshDashboard }) {
   const [submitted, setSubmitted] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  
+    const [formData, setFormData] = useState({
+    conversationRef: '',
+    subject: ''
+  })
 
-  const handleSubmit = (e) => {
+  const handleInputChange = (e) => {
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 3000)
+    setIsLoading(true)
+
+    try {
+      await apiService.createTicket(formData.conversationRef, formData.subject)
+      
+      setSubmitted(true)
+      setFormData({ conversationRef: '', subject: '' })
+      toast.success('Chamado criado com sucesso!')
+      
+      if (refreshDashboard) {
+        refreshDashboard()
+      }
+      
+      setTimeout(() => setSubmitted(false), 3000)
+    } catch (error) {
+      toast.error(error.message || 'Erro ao criar chamado')
+      console.error('Erro ao criar ticket:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -17,7 +48,7 @@ export default function AbrirChamado() {
         <div>
           <h1 className="text-lg font-extrabold text-[#111]">Abrir Novo Chamado</h1>
           <p className="text-xs text-[#6b7280]">
-            Simulação de entrada de chamados recebidos pelo sistema.
+            Simulação de entrada de mensagens de clientes recebidas pelo sistema.
           </p>
         </div>
       </header>
@@ -29,7 +60,7 @@ export default function AbrirChamado() {
           </div>
           <div>
             <h2 className="text-base font-bold text-[#111]">Formulário de Ticket</h2>
-            <p className="text-xs text-[#6b7280]">Insira as informações básicas da conversa</p>
+            <p className="text-xs text-[#6b7280]">Insira a mensagem enviada pelo cliente</p>
           </div>
         </div>
 
@@ -37,43 +68,60 @@ export default function AbrirChamado() {
           <div className="flex flex-col items-center justify-center gap-2 rounded-lg border border-green-200 bg-green-50 p-6 text-center text-green-800">
             <CheckCircle2 className="size-8 text-green-600" />
             <p className="text-sm font-bold">Chamado registrado com sucesso!</p>
-            <p className="text-xs text-green-700">Encaminhado para a fila de atendimento.</p>
+            <p className="text-xs text-green-700">Encaminhado para o roteamento inteligente.</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            
+            {/* Campo: Chat Ref */}
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-bold uppercase tracking-wider text-[#374151]">
                 Referência da Conversa (Chat Ref)
               </label>
               <input
                 type="text"
+                name="conversationRef"
                 required
-                placeholder="Ex: chat_982b189a"
-                defaultValue="chat_982b189a"
-                className="rounded-lg border border-[#e5e7eb] bg-[#f9fafb] p-3 font-mono text-sm text-[#111] outline-none focus:border-[#111] focus:bg-white"
+                placeholder="Ex: WHATS-16"
+                value={formData.conversationRef}
+                onChange={handleInputChange}
+                disabled={isLoading}
+                className="rounded-lg border border-[#e5e7eb] bg-[#f9fafb] p-3 font-mono text-sm text-[#111] outline-none focus:border-[#111] focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-[#374151]">
+                Mensagem do Cliente (Assunto)
+              </label>
+              <textarea
+                name="subject"
+                required
+                rows={3}
+                placeholder="Ex: Preciso de ajuda com meus cartões de crédito"
+                value={formData.subject}
+                onChange={handleInputChange}
+                disabled={isLoading}
+                className="resize-none rounded-lg border border-[#e5e7eb] bg-[#f9fafb] p-3 text-sm text-[#111] outline-none focus:border-[#111] focus:bg-white disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
 
-            <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-bold uppercase tracking-wider text-[#374151]">
-                Assunto / Departamento
-              </label>
-              <select
-                defaultValue="Cartões"
-                className="rounded-lg border border-[#e5e7eb] bg-[#f9fafb] p-3 text-sm text-[#111] outline-none focus:border-[#111] focus:bg-white"
-              >
-                <option value="Cartões">Cartões</option>
-                <option value="Empréstimos">Empréstimos</option>
-                <option value="Outros Assuntos">Outros Assuntos</option>
-              </select>
-            </div>
-
+            {/* Botão de Submit */}
             <button
               type="submit"
-              className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-[#facc15] py-3 text-sm font-bold text-[#111] transition-all hover:bg-[#eab308]"
+              disabled={isLoading}
+              className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-[#facc15] py-3 text-sm font-bold text-[#111] transition-all hover:bg-[#eab308] disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <PlusCircle className="size-4" strokeWidth={2.5} />
-              Criar e Enviar para Fila
+              {isLoading ? (
+                <>
+                  <Loader className="size-4 animate-spin" strokeWidth={2.5} />
+                  Analisando e Criando...
+                </>
+              ) : (
+                <>
+                  <PlusCircle className="size-4" strokeWidth={2.5} />
+                  Criar e Roteá-lo Automaticamente
+                </>
+              )}
             </button>
           </form>
         )}
