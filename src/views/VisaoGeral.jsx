@@ -18,19 +18,21 @@ export default function VisaoGeral({
     if (!selectedTicketId || !dashboardData || dashboardData.length === 0) return null
 
     for (const team of dashboardData) {
+      // 1. Procura na fila
       const queuedTicket = team.queue?.tickets?.find((t) => t.id === selectedTicketId)
       if (queuedTicket) {
         return {
           ticket: {
             ...queuedTicket,
             agent: 'Aguardando na Fila',
-            subject: queuedTicket.subject || 'Não informado no DTO',
-            entryDate: queuedTicket.entryDate || 'data desconhecida'
+            subject: queuedTicket.subject || 'Sem assunto',
+            entryDate: queuedTicket.entryDate || 'Data desconhecida'
           },
           agentId: null
         }
       }
 
+      // 2. Procura nos atendentes
       for (const agent of team.agents || []) {
         const agentTicket = agent.tickets?.find((t) => t.id === selectedTicketId)
         if (agentTicket) {
@@ -38,8 +40,8 @@ export default function VisaoGeral({
             ticket: {
               ...agentTicket,
               agent: agent.name,
-              subject: 'Não informado no DTO',
-              entryDate: 'Agora'
+              subject: agentTicket.subject || 'Sem assunto',
+              entryDate: agentTicket.entryDate || 'Data desconhecida'
             },
             agentId: agent.id 
           }
