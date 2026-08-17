@@ -24,8 +24,8 @@ export default function VisaoGeral({
           ticket: {
             ...queuedTicket,
             agent: 'Aguardando na Fila',
-            subject: 'Não informado no DTO',
-            entryDate: 'Agora'
+            subject: queuedTicket.subject || 'Não informado no DTO',
+            entryDate: queuedTicket.entryDate || 'data desconhecida'
           },
           agentId: null
         }
