@@ -1,7 +1,10 @@
-export default function StatusTag({ status = 'IN_SERVICE' }) {
-  return (
-    <span className="inline-flex shrink-0 rounded bg-[#111] px-1.5 py-0.5 font-mono text-[10px] font-bold text-white">
-      {status}
-    </span>
-  )
+import { TICKET_STATUS } from '../../constants/ticketStatus.js'
+
+export default function StatusTag({ status }) {
+  if (status === TICKET_STATUS.QUEUED) {
+    return <span className="bg-yellow-100 text-yellow-800">Na Fila</span>
+  }
+  if (status === TICKET_STATUS.IN_SERVICE) {
+    return <span className="bg-blue-100 text-blue-800">Em Atendimento</span>
+  }
 }

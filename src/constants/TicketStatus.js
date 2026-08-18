@@ -1,0 +1,5 @@
+export const TICKET_STATUS = {
+  QUEUED: 'QUEUED',
+  IN_SERVICE: 'IN_SERVICE',
+  CLOSED: 'CLOSED'
+}
