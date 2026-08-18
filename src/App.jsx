@@ -1,34 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Toaster } from 'sonner'
 import Sidebar from './components/layout/Sidebar.jsx'
 import VisaoGeral from './views/VisaoGeral.jsx'
 import AbrirChamado from './views/AbrirChamado.jsx'
 import FecharChamado from './views/FecharChamado.jsx'
-import { apiService } from './services/apiService'
+import { useDashboard } from './hooks/useDashboard.js' 
 
-function App() {
+export default function App() {
   const [activeTab, setActiveTab] = useState('visao-geral')
-  const [dashboardData, setDashboardData] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [isError, setIsError] = useState(false) 
-
-  const refreshDashboard = async () => {
-    try {
-      setIsLoading(true)
-      setIsError(false) // 2. Limpa o erro antes de tentar novamente
-      const data = await apiService.getDashboard()
-      setDashboardData(data)
-    } catch (error) {
-      console.error("Erro ao buscar painel:", error)
-      setIsError(true) // 3. Marca que houve falha na comunicação com a API
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    refreshDashboard()
-  }, [])
+  
+  const { dashboardData, isLoading, isError, refreshDashboard } = useDashboard()
 
   return (
     <div className="flex h-screen w-full bg-white">
@@ -61,5 +42,3 @@ function App() {
     </div>
   )
 }
-
-export default App
