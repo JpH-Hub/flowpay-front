@@ -11,7 +11,7 @@ export default function FecharChamado({ refreshDashboard }) {
     loadActiveTickets, 
     closeTicket 
   } = useCloseTicket(refreshDashboard)
-  
+
   useEffect(() => {
     loadActiveTickets()
   }, [loadActiveTickets])
@@ -68,7 +68,7 @@ export default function FecharChamado({ refreshDashboard }) {
 
                 <button
                   type="button"
-                  onClick={() => handleClose(t.id)}
+                  onClick={() => closeTicket(t.id)}
                   disabled={closingTicketId === t.id}
                   className="flex items-center gap-1.5 rounded-md border border-[#111] bg-white px-3 py-1.5 text-xs font-bold text-[#111] transition-colors hover:bg-red-50 hover:text-red-600 hover:border-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
