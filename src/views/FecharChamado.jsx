@@ -1,19 +1,73 @@
-import { useState } from 'react'
-import { CheckCircle, XCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { XCircle, Loader } from 'lucide-react'
+import { toast } from 'sonner'
 import StatusTag from '../components/ui/StatusTag.jsx'
+import { apiService } from '../services/apiService.js'
 
-const mockActiveTickets = [
-  { id: 'ticket-9821', chatRef: 'chat_982b189a', agent: 'Atendente 1', subject: 'Cartões', status: 'IN_SERVICE' },
-  { id: 'ticket-012c', chatRef: 'chat_012c85ff', agent: 'Atendente 2', subject: 'Cartões', status: 'IN_SERVICE' },
-  { id: 'ticket-445e', chatRef: 'chat_445e912c', agent: 'Atendente 4', subject: 'Empréstimos', status: 'IN_SERVICE' },
-  { id: 'ticket-221f', chatRef: 'chat_221f70aa', agent: 'Atendente 4', subject: 'Empréstimos', status: 'IN_SERVICE' },
-]
+export default function FecharChamado({ refreshDashboard }) {
+  const [tickets, setTickets] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [closingTicketId, setClosingTicketId] = useState(null)
 
-export default function FecharChamado() {
-  const [tickets, setTickets] = useState(mockActiveTickets)
+  useEffect(() => {
+    loadActiveTickets()
+  }, [])
 
-  const handleClose = (id) => {
-    setTickets((prev) => prev.filter((t) => t.id !== id))
+  const loadActiveTickets = async () => {
+    try {
+      setIsLoading(true)
+      const dashboardData = await apiService.getDashboard()
+      
+      const flatTickets = []
+      dashboardData.forEach((team) => {
+     team.queue?.tickets?.forEach((t) => {
+          flatTickets.push({ 
+            ...t, 
+            teamName: team.title, 
+            agentName: 'Aguardando na Fila' 
+          })
+        })
+     team.agents?.forEach((agent) => {
+          agent.tickets?.forEach((t) => {
+            flatTickets.push({ 
+              ...t, 
+              teamName: team.title, 
+              agentName: agent.name 
+            })
+          })
+        })
+      })
+      
+      setTickets(flatTickets)
+    } catch (error) {
+      toast.error('Erro ao carregar tickets ativos')
+      console.error(error)
+      setTickets([])
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const handleClose = async (id) => {
+    setClosingTicketId(id)
+    
+    try {
+     const numericId = String(id).replace('ticket-', '')
+      
+      await apiService.closeTicket(numericId)
+      
+     setTickets((prev) => prev.filter((t) => t.id !== id))
+      toast.success('Chamado encerrado com sucesso!')
+    
+      if (refreshDashboard) {
+        refreshDashboard()
+      }
+    } catch (error) {
+      toast.error(error.message || 'Erro ao encerrar chamado')
+      console.error(error)
+    } finally {
+      setClosingTicketId(null)
+    }
   }
 
   return (
@@ -35,7 +89,12 @@ export default function FecharChamado() {
           </span>
         </div>
 
-        {tickets.length === 0 ? (
+        {isLoading ? (
+          <div className="flex items-center justify-center gap-2 py-12 text-sm font-semibold text-[#6b7280]">
+            <Loader className="size-5 animate-spin" strokeWidth={2} />
+            Carregando tickets...
+          </div>
+        ) : tickets.length === 0 ? (
           <div className="py-12 text-center text-sm font-semibold text-[#9ca3af]">
             Nenhum chamado ativo no momento.
           </div>
@@ -48,21 +107,36 @@ export default function FecharChamado() {
               >
                 <div className="flex items-center gap-4">
                   <span className="font-mono text-xs font-bold text-[#111]">
-                    #{t.id.replace('ticket-', 'TK-')}
+                    #{String(t.id).replace('ticket-', 'TK-')}
                   </span>
                   <span className="font-mono text-xs text-[#4b5563]">{t.chatRef}</span>
-                  <span className="text-xs font-semibold text-[#111]">{t.subject}</span>
-                  <span className="text-xs text-[#6b7280]">({t.agent})</span>
+                  <span className="text-xs font-semibold text-[#111]">{t.subject || t.teamName}</span>
+                  <span className="text-xs text-[#6b7280]">({t.agentName})</span>
+                  
+                  {t.entryDate && (
+                    <span className="text-xs text-[#9ca3af]">{t.entryDate}</span>
+                  )}
+
                   <StatusTag status={t.status} />
                 </div>
 
                 <button
                   type="button"
                   onClick={() => handleClose(t.id)}
-                  className="flex items-center gap-1.5 rounded-md border border-[#111] bg-white px-3 py-1.5 text-xs font-bold text-[#111] transition-colors hover:bg-red-50 hover:text-red-600 hover:border-red-600"
+                  disabled={closingTicketId === t.id}
+                  className="flex items-center gap-1.5 rounded-md border border-[#111] bg-white px-3 py-1.5 text-xs font-bold text-[#111] transition-colors hover:bg-red-50 hover:text-red-600 hover:border-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <XCircle className="size-3.5" strokeWidth={2} />
-                  Encerrar
+                  {closingTicketId === t.id ? (
+                    <>
+                      <Loader className="size-3.5 animate-spin" strokeWidth={2} />
+                      Encerrando...
+                    </>
+                  ) : (
+                    <>
+                      <XCircle className="size-3.5" strokeWidth={2} />
+                      Encerrar
+                    </>
+                  )}
                 </button>
               </div>
             ))}
