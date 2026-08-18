@@ -1,74 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { XCircle, Loader } from 'lucide-react'
-import { toast } from 'sonner'
 import StatusTag from '../components/ui/StatusTag.jsx'
-import { apiService } from '../services/apiService.js'
+import { useCloseTicket } from '../hooks/useCloseTicket'
 
 export default function FecharChamado({ refreshDashboard }) {
-  const [tickets, setTickets] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [closingTicketId, setClosingTicketId] = useState(null)
-
+  const { 
+    tickets, 
+    isLoading, 
+    closingTicketId, 
+    loadActiveTickets, 
+    closeTicket 
+  } = useCloseTicket(refreshDashboard)
+  
   useEffect(() => {
     loadActiveTickets()
-  }, [])
-
-  const loadActiveTickets = async () => {
-    try {
-      setIsLoading(true)
-      const dashboardData = await apiService.getDashboard()
-      
-      const flatTickets = []
-      dashboardData.forEach((team) => {
-     team.queue?.tickets?.forEach((t) => {
-          flatTickets.push({ 
-            ...t, 
-            teamName: team.title, 
-            agentName: 'Aguardando na Fila' 
-          })
-        })
-     team.agents?.forEach((agent) => {
-          agent.tickets?.forEach((t) => {
-            flatTickets.push({ 
-              ...t, 
-              teamName: team.title, 
-              agentName: agent.name 
-            })
-          })
-        })
-      })
-      
-      setTickets(flatTickets)
-    } catch (error) {
-      toast.error('Erro ao carregar tickets ativos')
-      console.error(error)
-      setTickets([])
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleClose = async (id) => {
-    setClosingTicketId(id)
-    
-    try {
-     const numericId = String(id).replace('ticket-', '')
-      
-      await apiService.closeTicket(numericId)
-      
-     setTickets((prev) => prev.filter((t) => t.id !== id))
-      toast.success('Chamado encerrado com sucesso!')
-    
-      if (refreshDashboard) {
-        refreshDashboard()
-      }
-    } catch (error) {
-      toast.error(error.message || 'Erro ao encerrar chamado')
-      console.error(error)
-    } finally {
-      setClosingTicketId(null)
-    }
-  }
+  }, [loadActiveTickets])
 
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-6 p-6">

@@ -1,15 +1,13 @@
 import { useState } from 'react'
 import { PlusCircle, MessageSquarePlus, CheckCircle2, Loader } from 'lucide-react'
-import { toast } from 'sonner' 
-import { apiService } from '../services/apiService.js'
+import { useCreateTicket } from '../hooks/useCreateTicket' 
 
 export default function AbrirChamado({ refreshDashboard }) {
-  const [submitted, setSubmitted] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [formData, setFormData] = useState({ conversationRef: '', subject: '' })
   
-    const [formData, setFormData] = useState({
-    conversationRef: '',
-    subject: ''
+  const { createTicket, isLoading, submitted } = useCreateTicket(() => {
+    setFormData({ conversationRef: '', subject: '' }) 
+    if (refreshDashboard) refreshDashboard()
   })
 
   const handleInputChange = (e) => {
@@ -17,28 +15,9 @@ export default function AbrirChamado({ refreshDashboard }) {
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    setIsLoading(true)
-
-    try {
-      await apiService.createTicket(formData.conversationRef, formData.subject)
-      
-      setSubmitted(true)
-      setFormData({ conversationRef: '', subject: '' })
-      toast.success('Chamado criado com sucesso!')
-      
-      if (refreshDashboard) {
-        refreshDashboard()
-      }
-      
-      setTimeout(() => setSubmitted(false), 3000)
-    } catch (error) {
-      toast.error(error.message || 'Erro ao criar chamado')
-      console.error('Erro ao criar ticket:', error)
-    } finally {
-      setIsLoading(false)
-    }
+    createTicket(formData.conversationRef, formData.subject)
   }
 
   return (
