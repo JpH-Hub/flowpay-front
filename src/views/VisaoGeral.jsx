@@ -10,6 +10,7 @@ export default function VisaoGeral({
   setActiveTab, 
   dashboardData = [], 
   isLoading,
+  isError,
   onRetry 
 }) {
   const [selectedTicketId, setSelectedTicketId] = useState(null)
@@ -55,8 +56,9 @@ export default function VisaoGeral({
   const selectedTicket = selectionInfo?.ticket
   const selectedAgentId = selectionInfo?.agentId
 
-  // Se não estiver carregando e os dados vierem vazios/nulos, assumimos que o servidor está fora ou sem dados
-  const isServerOffline = !isLoading && (!dashboardData || dashboardData.length === 0)
+ const isServerOffline = !isLoading && isError
+
+  const isEmptyDashboard = !isLoading && !isError && dashboardData.length === 0
 
   return (
     <div className="flex h-screen w-full">

@@ -10,15 +10,17 @@ function App() {
   const [activeTab, setActiveTab] = useState('visao-geral')
   const [dashboardData, setDashboardData] = useState([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isError, setIsError] = useState(false) 
 
   const refreshDashboard = async () => {
     try {
       setIsLoading(true)
+      setIsError(false) // 2. Limpa o erro antes de tentar novamente
       const data = await apiService.getDashboard()
       setDashboardData(data)
     } catch (error) {
       console.error("Erro ao buscar painel:", error)
-      setDashboardData([]) 
+      setIsError(true) // 3. Marca que houve falha na comunicação com a API
     } finally {
       setIsLoading(false)
     }
@@ -38,6 +40,7 @@ function App() {
           setActiveTab={setActiveTab} 
           dashboardData={dashboardData} 
           isLoading={isLoading}  
+          isError={isError} 
           onRetry={refreshDashboard}      
         />
       )}
