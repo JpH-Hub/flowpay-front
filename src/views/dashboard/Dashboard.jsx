@@ -1,11 +1,11 @@
 import { useState } from 'react'
-import Sidebar from '../components/layout/Sidebar.jsx'
-import Header from '../components/layout/Header.jsx'
-import TeamColumn from '../components/dashboard/TeamColumn.jsx'
-import TicketDetails from '../components/layout/TicketDetails.jsx'
-import { ErrorBoundary } from '../components/layout/ErrorBoundary.jsx'
+import Sidebar from '../../components/layout/Sidebar.jsx'
+import Header from '../../components/layout/Header.jsx'
+import TeamColumn from '../../components/dashboard/TeamColumn.jsx'
+import TicketDetails from '../../components/layout/TicketDetails.jsx'
+import { ErrorBoundary } from '../../components/layout/ErrorBoundary.jsx'
 
-export default function VisaoGeral({ 
+export default function Dashboard({ 
   activeTab, 
   setActiveTab, 
   dashboardData = [], 

@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Toaster } from 'sonner'
 import Sidebar from './components/layout/Sidebar.jsx'
-import VisaoGeral from './views/VisaoGeral.jsx'
-import AbrirChamado from './views/AbrirChamado.jsx'
-import FecharChamado from './views/FecharChamado.jsx'
+import VisaoGeral from './views/dashboard/Dashboard.jsx'
+import AbrirChamado from './views/createTicket/CreateTicket.jsx'
+import FecharChamado from './views/closeTicket/CloseTicket.jsx'
 import { useDashboard } from './hooks/useDashboard.js' 
 
 export default function App() {

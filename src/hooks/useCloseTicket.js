@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { toast } from 'sonner'
 import { apiService } from '../services/apiService'
+import { getNumericTicketId } from '../utils/ticketUtils.js'
 
 export function useCloseTicket(onSuccess) {
   const [tickets, setTickets] = useState([])
@@ -33,10 +34,10 @@ export function useCloseTicket(onSuccess) {
   }, [])
 
   const closeTicket = async (id) => {
-    setClosingTicketId(id)
-    try {
-      const numericId = String(id).replace('ticket-', '')
-      await apiService.closeTicket(numericId)
+  setClosingTicketId(id)
+  try {
+    const numericId = getNumericTicketId(id)
+    await apiService.closeTicket(numericId)
       
       setTickets((prev) => prev.filter((t) => t.id !== id))
       toast.success('Chamado encerrado com sucesso!')
