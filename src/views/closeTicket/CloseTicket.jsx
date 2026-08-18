@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
 import { XCircle, Loader } from 'lucide-react'
-import StatusTag from '../components/ui/StatusTag.jsx'
-import { useCloseTicket } from '../hooks/useCloseTicket'
+import StatusTag from '../../components/ui/StatusTag.jsx'
+import { useCloseTicket } from '../../hooks/useCloseTicket.js'
+import { getDisplayTicketId } from '../../utils/ticketUtils.js'
 
-export default function FecharChamado({ refreshDashboard }) {
+export default function CloseTicket({ refreshDashboard }) {
   const { 
     tickets, 
     isLoading, 
@@ -53,7 +54,7 @@ export default function FecharChamado({ refreshDashboard }) {
               >
                 <div className="flex items-center gap-4">
                   <span className="font-mono text-xs font-bold text-[#111]">
-                    #{String(t.id).replace('ticket-', 'TK-')}
+                      #{getDisplayTicketId(t.id)}
                   </span>
                   <span className="font-mono text-xs text-[#4b5563]">{t.chatRef}</span>
                   <span className="text-xs font-semibold text-[#111]">{t.subject || t.teamName}</span>

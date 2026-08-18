@@ -1,8 +1,8 @@
 import { useState } from 'react'
 import { PlusCircle, MessageSquarePlus, CheckCircle2, Loader } from 'lucide-react'
-import { useCreateTicket } from '../hooks/useCreateTicket' 
+import { useCreateTicket } from '../../hooks/useCreateTicket' 
 
-export default function AbrirChamado({ refreshDashboard }) {
+export default function CreateTicket({ refreshDashboard }) {
   const [formData, setFormData] = useState({ conversationRef: '', subject: '' })
   
   const { createTicket, isLoading, submitted } = useCreateTicket(() => {
