@@ -1,32 +1,15 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Toaster } from 'sonner'
 import Sidebar from './components/layout/Sidebar.jsx'
-import VisaoGeral from './views/VisaoGeral.jsx'
-import AbrirChamado from './views/AbrirChamado.jsx'
-import FecharChamado from './views/FecharChamado.jsx'
-import { apiService } from './services/apiService'
+import VisaoGeral from './views/dashboard/Dashboard.jsx'
+import AbrirChamado from './views/createTicket/CreateTicket.jsx'
+import FecharChamado from './views/closeTicket/CloseTicket.jsx'
+import { useDashboard } from './hooks/useDashboard.js' 
 
-function App() {
+export default function App() {
   const [activeTab, setActiveTab] = useState('visao-geral')
-  const [dashboardData, setDashboardData] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-
-  const refreshDashboard = async () => {
-    try {
-      setIsLoading(true)
-      const data = await apiService.getDashboard()
-      setDashboardData(data)
-    } catch (error) {
-      console.error("Erro ao buscar painel:", error)
-      setDashboardData([]) 
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  useEffect(() => {
-    refreshDashboard()
-  }, [])
+  
+  const { dashboardData, isLoading, isError, refreshDashboard } = useDashboard()
 
   return (
     <div className="flex h-screen w-full bg-white">
@@ -38,6 +21,7 @@ function App() {
           setActiveTab={setActiveTab} 
           dashboardData={dashboardData} 
           isLoading={isLoading}  
+          isError={isError} 
           onRetry={refreshDashboard}      
         />
       )}
@@ -58,5 +42,3 @@ function App() {
     </div>
   )
 }
-
-export default App

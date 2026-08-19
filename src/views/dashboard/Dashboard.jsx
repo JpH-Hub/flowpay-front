@@ -1,15 +1,16 @@
 import { useState } from 'react'
-import Sidebar from '../components/layout/Sidebar.jsx'
-import Header from '../components/layout/Header.jsx'
-import TeamColumn from '../components/dashboard/TeamColumn.jsx'
-import TicketDetails from '../components/layout/TicketDetails.jsx'
-import { ErrorBoundary } from '../components/layout/ErrorBoundary.jsx'
+import Sidebar from '../../components/layout/Sidebar.jsx'
+import Header from '../../components/layout/Header.jsx'
+import TeamColumn from '../../components/dashboard/TeamColumn.jsx'
+import TicketDetails from '../../components/layout/TicketDetails.jsx'
+import { ErrorBoundary } from '../../components/layout/ErrorBoundary.jsx'
 
-export default function VisaoGeral({ 
+export default function Dashboard({ 
   activeTab, 
   setActiveTab, 
   dashboardData = [], 
   isLoading,
+  isError,
   onRetry 
 }) {
   const [selectedTicketId, setSelectedTicketId] = useState(null)
@@ -55,8 +56,9 @@ export default function VisaoGeral({
   const selectedTicket = selectionInfo?.ticket
   const selectedAgentId = selectionInfo?.agentId
 
-  // Se não estiver carregando e os dados vierem vazios/nulos, assumimos que o servidor está fora ou sem dados
-  const isServerOffline = !isLoading && (!dashboardData || dashboardData.length === 0)
+ const isServerOffline = !isLoading && isError
+
+  const isEmptyDashboard = !isLoading && !isError && dashboardData.length === 0
 
   return (
     <div className="flex h-screen w-full">

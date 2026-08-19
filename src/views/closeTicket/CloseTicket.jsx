@@ -1,74 +1,21 @@
-import { useState, useEffect } from 'react'
+import { useEffect } from 'react'
 import { XCircle, Loader } from 'lucide-react'
-import { toast } from 'sonner'
-import StatusTag from '../components/ui/StatusTag.jsx'
-import { apiService } from '../services/apiService.js'
+import StatusTag from '../../components/ui/StatusTag.jsx'
+import { useCloseTicket } from '../../hooks/useCloseTicket.js'
+import { getDisplayTicketId } from '../../utils/ticketUtils.js'
 
-export default function FecharChamado({ refreshDashboard }) {
-  const [tickets, setTickets] = useState([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [closingTicketId, setClosingTicketId] = useState(null)
+export default function CloseTicket({ refreshDashboard }) {
+  const { 
+    tickets, 
+    isLoading, 
+    closingTicketId, 
+    loadActiveTickets, 
+    closeTicket 
+  } = useCloseTicket(refreshDashboard)
 
   useEffect(() => {
     loadActiveTickets()
-  }, [])
-
-  const loadActiveTickets = async () => {
-    try {
-      setIsLoading(true)
-      const dashboardData = await apiService.getDashboard()
-      
-      const flatTickets = []
-      dashboardData.forEach((team) => {
-     team.queue?.tickets?.forEach((t) => {
-          flatTickets.push({ 
-            ...t, 
-            teamName: team.title, 
-            agentName: 'Aguardando na Fila' 
-          })
-        })
-     team.agents?.forEach((agent) => {
-          agent.tickets?.forEach((t) => {
-            flatTickets.push({ 
-              ...t, 
-              teamName: team.title, 
-              agentName: agent.name 
-            })
-          })
-        })
-      })
-      
-      setTickets(flatTickets)
-    } catch (error) {
-      toast.error('Erro ao carregar tickets ativos')
-      console.error(error)
-      setTickets([])
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
-  const handleClose = async (id) => {
-    setClosingTicketId(id)
-    
-    try {
-     const numericId = String(id).replace('ticket-', '')
-      
-      await apiService.closeTicket(numericId)
-      
-     setTickets((prev) => prev.filter((t) => t.id !== id))
-      toast.success('Chamado encerrado com sucesso!')
-    
-      if (refreshDashboard) {
-        refreshDashboard()
-      }
-    } catch (error) {
-      toast.error(error.message || 'Erro ao encerrar chamado')
-      console.error(error)
-    } finally {
-      setClosingTicketId(null)
-    }
-  }
+  }, [loadActiveTickets])
 
   return (
     <div className="flex min-w-0 flex-1 flex-col gap-6 p-6">
@@ -107,7 +54,7 @@ export default function FecharChamado({ refreshDashboard }) {
               >
                 <div className="flex items-center gap-4">
                   <span className="font-mono text-xs font-bold text-[#111]">
-                    #{String(t.id).replace('ticket-', 'TK-')}
+                      #{getDisplayTicketId(t.id)}
                   </span>
                   <span className="font-mono text-xs text-[#4b5563]">{t.chatRef}</span>
                   <span className="text-xs font-semibold text-[#111]">{t.subject || t.teamName}</span>
@@ -122,7 +69,7 @@ export default function FecharChamado({ refreshDashboard }) {
 
                 <button
                   type="button"
-                  onClick={() => handleClose(t.id)}
+                  onClick={() => closeTicket(t.id)}
                   disabled={closingTicketId === t.id}
                   className="flex items-center gap-1.5 rounded-md border border-[#111] bg-white px-3 py-1.5 text-xs font-bold text-[#111] transition-colors hover:bg-red-50 hover:text-red-600 hover:border-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
