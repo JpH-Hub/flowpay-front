@@ -8,7 +8,17 @@ export default defineConfig({
     tailwindcss(),
   ],
   test: {
-    environment: 'happy-dom', 
-    globals: true,       
+    environment: 'happy-dom',
+    globals: true,
+    coverage: {
+      provider: 'v8', 
+      reporter: ['text', 'json', 'html'], 
+      exclude: [
+        'node_modules/',
+        'src/main.jsx',
+        '**/*.test.{js,jsx}',
+        '**/__tests__/**'
+      ]
+    }
   }
 })
