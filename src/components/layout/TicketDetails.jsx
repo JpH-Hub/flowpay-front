@@ -88,18 +88,15 @@ export default function TicketDetails({ ticket, onClose }) {
 
           <DetailRow label="Atendente Atribuído" value={ticket.agent} />
           
-          {/* NOVA LINHA DO TEMPO COM OS TIMESTAMPS */}
           <div className="mt-6">
             <h3 className="text-xs font-bold text-[#111] uppercase tracking-wider mb-2">Histórico de Eventos</h3>
             <div className="rounded-lg bg-[#f9fafb] border border-[#e5e7eb] p-3 space-y-2">
-              
-              {/* Criado em */}
+          
               <div className="flex justify-between items-center text-xs">
                 <span className="text-[#4b5563]">Criado em:</span>
                 <span className="font-mono font-semibold text-[#111]">{formatDateTime(ticket.createdAt || ticket.entryDate)}</span>
               </div>
               
-              {/* Iniciado em */}
               {ticket.startedAt && (
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-[#4b5563]">Início do Atendimento:</span>
@@ -107,7 +104,7 @@ export default function TicketDetails({ ticket, onClose }) {
                 </div>
               )}
               
-              {/* Encerrado em */}
+
               {ticket.closedAt && (
                 <div className="flex justify-between items-center text-xs">
                   <span className="text-[#4b5563]">Encerrado em:</span>
@@ -115,7 +112,7 @@ export default function TicketDetails({ ticket, onClose }) {
                 </div>
               )}
 
-              {/* Rejeição */}
+
               {ticket.rejectedAt && (
                 <div className="mt-2 border-t border-red-200 pt-2">
                   <div className="flex justify-between items-center text-xs">
