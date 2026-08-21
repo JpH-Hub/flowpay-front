@@ -21,18 +21,18 @@ export default function CreateTicket({ refreshDashboard }) {
   }
 
   return (
-    <div className="flex min-w-0 flex-1 flex-col gap-6 p-6">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto p-4 md:gap-6 md:p-6">
       {/* Header */}
       <header className="flex items-center justify-between border-b border-[#e5e7eb] pb-4">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-lg font-extrabold text-[#111]">Abrir Novo Chamado</h1>
-          <p className="text-xs text-[#6b7280]">
+          <p className="text-xs leading-relaxed text-[#6b7280]">
             Simulação de entrada de mensagens de clientes recebidas pelo sistema.
           </p>
         </div>
       </header>
 
-      <div className="mx-auto mt-4 w-full max-w-xl rounded-xl border border-[#e5e7eb] bg-white p-6 shadow-sm">
+      <div className="mx-auto mt-2 w-full max-w-xl rounded-xl border border-[#e5e7eb] bg-white p-4 shadow-sm md:mt-4 md:p-6">
         <div className="mb-6 flex items-center gap-3 border-b border-[#e5e7eb] pb-4">
           <div className="flex size-10 items-center justify-center rounded-lg bg-[#facc15] text-[#111]">
             <MessageSquarePlus className="size-5" strokeWidth={2.5} />

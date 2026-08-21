@@ -6,7 +6,7 @@ export function useDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [isError, setIsError] = useState(false)
 
-  // Usamos useCallback para o React não recriar essa função à toa
+ 
   const refreshDashboard = useCallback(async () => {
     try {
       setIsLoading(true)
@@ -21,7 +21,7 @@ export function useDashboard() {
     }
   }, [])
 
-  // Carrega ao iniciar
+
   useEffect(() => {
     refreshDashboard()
   }, [refreshDashboard])

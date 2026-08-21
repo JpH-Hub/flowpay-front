@@ -12,7 +12,7 @@ export default function App() {
   const { dashboardData, isLoading, isError, refreshDashboard } = useDashboard()
 
   return (
-    <div className="flex h-screen w-full bg-white">
+    <div className="flex min-h-screen w-full flex-col bg-white md:h-screen md:flex-row">
       <Toaster position="top-right" richColors />
 
       {activeTab === 'visao-geral' && (
@@ -27,14 +27,14 @@ export default function App() {
       )}
 
       {activeTab === 'abrir-chamado' && (
-        <div className="flex h-screen w-full">
+        <div className="flex min-h-screen w-full flex-col md:h-screen md:flex-row">
           <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <AbrirChamado refreshDashboard={refreshDashboard} />
         </div>
       )}
 
       {activeTab === 'fechar-chamado' && (
-        <div className="flex h-screen w-full">
+        <div className="flex min-h-screen w-full flex-col md:h-screen md:flex-row">
           <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
           <FecharChamado refreshDashboard={refreshDashboard} />
         </div>

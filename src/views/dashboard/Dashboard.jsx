@@ -19,7 +19,6 @@ export default function Dashboard({
     if (!selectedTicketId || !dashboardData || dashboardData.length === 0) return null
 
     for (const team of dashboardData) {
-      // 1. Procura na fila
       const queuedTicket = team.queue?.tickets?.find((t) => t.id === selectedTicketId)
       if (queuedTicket) {
         return {
@@ -33,7 +32,6 @@ export default function Dashboard({
         }
       }
 
-      // 2. Procura nos atendentes
       for (const agent of team.agents || []) {
         const agentTicket = agent.tickets?.find((t) => t.id === selectedTicketId)
         if (agentTicket) {
@@ -61,22 +59,20 @@ export default function Dashboard({
   const isEmptyDashboard = !isLoading && !isError && dashboardData.length === 0
 
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex min-h-screen w-full flex-col md:h-screen md:flex-row">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <main className="flex-1 bg-gray-50 flex flex-col min-w-0">
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col bg-gray-50">
         <Header title="Visão Geral" />
         
         <div className="flex-1 overflow-x-auto flex">
-          <div className="flex-1 p-6">
+          <div className="min-w-0 flex-1 p-4 md:p-6">
             
-            {/* 1. Loading */}
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
                 <p className="text-gray-500 font-medium">Carregando painel...</p>
               </div>
 
-            /* 2. Servidor Offline / Indisponível */
             ) : isServerOffline ? (
               <div className="flex flex-col items-center justify-center h-full text-center gap-2">
                 <div className="rounded-full bg-amber-100 p-3 text-amber-600 mb-1">🔌</div>
@@ -92,10 +88,9 @@ export default function Dashboard({
                 </button>
               </div>
 
-            /* 3. Renderização Protegida pelo ErrorBoundary */
             ) : (
               <ErrorBoundary>
-                <div className="flex gap-6 h-full min-w-max">
+                <div className="flex h-full flex-col gap-6 md:min-w-max md:flex-row">
                   {dashboardData.map((column) => (
                     <TeamColumn
                       key={column.id}
@@ -115,7 +110,10 @@ export default function Dashboard({
           </div>
 
           {selectedTicket && (
-            <TicketDetails ticket={selectedTicket} />
+            <TicketDetails
+              ticket={selectedTicket}
+              onClose={() => setSelectedTicketId(null)}
+            />
           )}
 
         </div>
