@@ -4,6 +4,8 @@ import Header from '../../components/layout/Header.jsx'
 import TeamColumn from '../../components/dashboard/TeamColumn.jsx'
 import TicketDetails from '../../components/layout/TicketDetails.jsx'
 import { ErrorBoundary } from '../../components/layout/ErrorBoundary.jsx'
+import { useMonitoring } from '../../hooks/useMonitoring.js'
+import RecentActivityFeed from '../../components/dashboard/RecentActivityFeed.jsx'
 
 export default function Dashboard({ 
   activeTab, 
@@ -14,39 +16,60 @@ export default function Dashboard({
   onRetry 
 }) {
   const [selectedTicketId, setSelectedTicketId] = useState(null)
+  
+  const { recentActivity } = useMonitoring()
 
   const getSelectedTicketInfo = () => {
-    if (!selectedTicketId || !dashboardData || dashboardData.length === 0) return null
+    if (!selectedTicketId) return null
 
-    for (const team of dashboardData) {
-      const queuedTicket = team.queue?.tickets?.find((t) => t.id === selectedTicketId)
-      if (queuedTicket) {
-        return {
-          ticket: {
-            ...queuedTicket,
-            agent: 'Aguardando na Fila',
-            subject: queuedTicket.subject || 'Sem assunto',
-            entryDate: queuedTicket.entryDate || 'Data desconhecida'
-          },
-          agentId: null
-        }
-      }
-
-      for (const agent of team.agents || []) {
-        const agentTicket = agent.tickets?.find((t) => t.id === selectedTicketId)
-        if (agentTicket) {
+    // 2. Procura primeiro nos tickets ativos (Fila e Atendentes)
+    if (dashboardData && dashboardData.length > 0) {
+      for (const team of dashboardData) {
+        const queuedTicket = team.queue?.tickets?.find((t) => t.id === selectedTicketId)
+        if (queuedTicket) {
           return {
             ticket: {
-              ...agentTicket,
-              agent: agent.name,
-              subject: agentTicket.subject || 'Sem assunto',
-              entryDate: agentTicket.entryDate || 'Data desconhecida'
+              ...queuedTicket,
+              agent: 'Aguardando na Fila',
+              subject: queuedTicket.subject || 'Sem assunto',
+              entryDate: queuedTicket.entryDate || 'Data desconhecida'
             },
-            agentId: agent.id 
+            agentId: null
+          }
+        }
+
+        for (const agent of team.agents || []) {
+          const agentTicket = agent.tickets?.find((t) => t.id === selectedTicketId)
+          if (agentTicket) {
+            return {
+              ticket: {
+                ...agentTicket,
+                agent: agent.name,
+                subject: agentTicket.subject || 'Sem assunto',
+                entryDate: agentTicket.entryDate || 'Data desconhecida'
+              },
+              agentId: agent.id 
+            }
           }
         }
       }
     }
+
+    // 3. Se não achou ativo, procura na lista de Atividades Recentes
+    if (recentActivity && recentActivity.length > 0) {
+      const recentTicket = recentActivity.find((t) => t.id === selectedTicketId)
+      if (recentTicket) {
+        return {
+          ticket: {
+            ...recentTicket,
+            agent: recentTicket.agentName || 'Sistema', // Pega o nome de quem fechou
+            subject: recentTicket.subject || 'Sem assunto',
+          },
+          agentId: null
+        }
+      }
+    }
+
     return null
   }
 
@@ -54,9 +77,7 @@ export default function Dashboard({
   const selectedTicket = selectionInfo?.ticket
   const selectedAgentId = selectionInfo?.agentId
 
- const isServerOffline = !isLoading && isError
-
-  const isEmptyDashboard = !isLoading && !isError && dashboardData.length === 0
+  const isServerOffline = !isLoading && isError
 
   return (
     <div className="flex min-h-screen w-full flex-col md:h-screen md:flex-row">
@@ -65,8 +86,8 @@ export default function Dashboard({
       <main className="flex min-h-0 min-w-0 flex-1 flex-col bg-gray-50">
         <Header title="Visão Geral" />
         
-        <div className="flex-1 overflow-x-auto flex">
-          <div className="min-w-0 flex-1 p-4 md:p-6">
+        <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="min-w-0 p-4 md:p-6">
             
             {isLoading ? (
               <div className="flex items-center justify-center h-full">
@@ -90,19 +111,30 @@ export default function Dashboard({
 
             ) : (
               <ErrorBoundary>
-                <div className="flex h-full flex-col gap-6 md:min-w-max md:flex-row">
-                  {dashboardData.map((column) => (
-                    <TeamColumn
-                      key={column.id}
-                      title={column.title}
-                      capacity={column.capacity}
-                      queue={column.queue}
-                      agents={column.agents}
-                      selectedTicketId={selectedTicketId}
-                      selectedAgentId={selectedAgentId}
-                      onTicketSelect={setSelectedTicketId}
-                    />
-                  ))}
+               
+                <div className="flex flex-col gap-6">
+                  
+                 
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
+                    {dashboardData.map((column) => (
+                      <TeamColumn
+                        key={column.id}
+                        title={column.title}
+                        capacity={column.capacity}
+                        queue={column.queue}
+                        agents={column.agents}
+                        selectedTicketId={selectedTicketId}
+                        selectedAgentId={selectedAgentId}
+                        onTicketSelect={setSelectedTicketId}
+                      />
+                    ))}
+                  </div>
+                  <RecentActivityFeed 
+                    recentTickets={recentActivity}
+                    selectedTicketId={selectedTicketId}
+                    onTicketSelect={setSelectedTicketId}
+                  />
+
                 </div>
               </ErrorBoundary>
             )}

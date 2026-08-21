@@ -44,5 +44,16 @@ export const apiService = {
     
     return handleResponse(response);
   },
+
+  getRecentActivity: async () => {
+    const response = await fetch(`${API_URL}/monitoring`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+    
+    return handleResponse(response);
+  },
   
 };
