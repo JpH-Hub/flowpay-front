@@ -12,7 +12,7 @@ export default function TeamColumn({
   onTicketSelect,
 }) {
   return (
-    <div className="flex min-w-0 flex-1 flex-col gap-3">
+    <div className="flex min-w-0 flex-1 flex-col gap-3 md:min-w-[280px]">
       <div className="flex items-center justify-between pb-1">
         <h3 className="text-[15px] font-bold text-[#111]">{title}</h3>
         <CapacityBadge current={capacity.current} max={capacity.max} />

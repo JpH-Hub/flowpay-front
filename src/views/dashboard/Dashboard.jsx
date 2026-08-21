@@ -61,14 +61,14 @@ export default function Dashboard({
   const isEmptyDashboard = !isLoading && !isError && dashboardData.length === 0
 
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex min-h-screen w-full flex-col md:h-screen md:flex-row">
       <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <main className="flex-1 bg-gray-50 flex flex-col min-w-0">
+      <main className="flex min-h-0 min-w-0 flex-1 flex-col bg-gray-50">
         <Header title="Visão Geral" />
         
         <div className="flex-1 overflow-x-auto flex">
-          <div className="flex-1 p-6">
+          <div className="min-w-0 flex-1 p-4 md:p-6">
             
             {/* 1. Loading */}
             {isLoading ? (
@@ -95,7 +95,7 @@ export default function Dashboard({
             /* 3. Renderização Protegida pelo ErrorBoundary */
             ) : (
               <ErrorBoundary>
-                <div className="flex gap-6 h-full min-w-max">
+                <div className="flex h-full flex-col gap-6 md:min-w-max md:flex-row">
                   {dashboardData.map((column) => (
                     <TeamColumn
                       key={column.id}
@@ -115,7 +115,10 @@ export default function Dashboard({
           </div>
 
           {selectedTicket && (
-            <TicketDetails ticket={selectedTicket} />
+            <TicketDetails
+              ticket={selectedTicket}
+              onClose={() => setSelectedTicketId(null)}
+            />
           )}
 
         </div>
